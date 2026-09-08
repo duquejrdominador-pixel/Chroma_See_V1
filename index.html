@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#15171A">
+
+<!-- ══════════════════════════════════════════════════════════════
+     SEARCH AND SHARING
+
+     ONE THING TO EDIT: find and replace every occurrence of
+        https://YOURNAME.github.io/ChromaSee/
+     with your real published address. It appears in this head,
+     in robots.txt and in sitemap.xml. If you skip this, search
+     engines will try to index an address that does not exist.
+     ══════════════════════════════════════════════════════════════ -->
+
+<title>ChromaSee — an AI that names an object's colour from a camera</title>
+<meta name="description" content="ChromaSee is a teachable image classifier that identifies an object's colour from a live camera and says it out loud. Built for learners with colour vision deficiency. Runs entirely in the browser.">
+<meta name="author" content="John Louise A. Marcos, Carlos Arthuro J. Abion, Sweet Melanie C. Unida, Janela Eunice J. Zuniga">
+<link rel="canonical" href="https://YOURNAME.github.io/ChromaSee/">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="ChromaSee">
+<meta property="og:locale" content="en_PH">
+<meta property="og:title" content="ChromaSee — an AI that names an object's colour from a camera">
+<meta property="og:description" content="A teachable image classifier that identifies an object's colour from a live camera and says it out loud. Built for learners with colour vision deficiency.">
+<meta property="og:url" content="https://YOURNAME.github.io/ChromaSee/">
+<meta property="og:image" content="https://YOURNAME.github.io/ChromaSee/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="The ChromaSee wordmark above red, yellow, blue and grey colour chips.">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="ChromaSee — an AI that names an object's colour from a camera">
+<meta name="twitter:description" content="A teachable image classifier that names an object's colour out loud, for learners with colour vision deficiency.">
+<meta name="twitter:image" content="https://YOURNAME.github.io/ChromaSee/og-image.png">
+
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%2315171A'/><circle cx='11.5' cy='12' r='5.4' fill='%23D8232A'/><circle cx='20.5' cy='12' r='5.4' fill='%23F5B301'/><circle cx='16' cy='21' r='5.4' fill='%231D5FD1'/></svg>">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://YOURNAME.github.io/ChromaSee/#website",
+      "url": "https://YOURNAME.github.io/ChromaSee/",
+      "name": "ChromaSee",
+      "description": "A teachable image classifier that identifies an object's colour from a live camera, built for learners with colour vision deficiency.",
+      "inLanguage": "en"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "@id": "https://YOURNAME.github.io/ChromaSee/#app",
+      "name": "ChromaSee",
+      "alternateName": "ChromaSee_PrimaryColor_Classifier_V1",
+      "applicationCategory": "EducationalApplication",
+      "applicationSubCategory": "Assistive technology",
+      "operatingSystem": "Any modern web browser",
+      "softwareVersion": "1.0",
+      "url": "https://YOURNAME.github.io/ChromaSee/",
+      "image": "https://YOURNAME.github.io/ChromaSee/og-image.png",
+      "description": "ChromaSee reads an object's colour from a live camera feed and names it out loud. It classifies red, yellow and blue plus a Nothing state, announces only above 85% confidence, and processes every frame on the device.",
+      "featureList": [
+        "Live camera colour identification",
+        "Spoken colour names",
+        "Four-class model including an explicit Nothing state",
+        "85% confidence threshold before announcing",
+        "Runs on-device with no image upload"
+      ],
+      "audience": {
+        "@type": "Audience",
+        "audienceType": "Learners with colour vision deficiency"
+      },
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "PHP" }
+    },
+    {
+      "@type": "Article",
+      "@id": "https://YOURNAME.github.io/ChromaSee/#rationale",
+      "headline": "Why ChromaSee exists: colour blindness is common, largely undiagnosed, and rarely accommodated",
+      "url": "https://YOURNAME.github.io/ChromaSee/#rationale",
+      "articleSection": "Rationale",
+      "inLanguage": "en",
+      "about": [
+        { "@type": "MedicalCondition", "name": "Color vision deficiency" },
+        { "@type": "Thing", "name": "Assistive technology" }
+      ],
+      "isPartOf": { "@id": "https://YOURNAME.github.io/ChromaSee/#website" }
+    }
+  ]
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+/* ═══════════════════════════════════════════════════════════
+   TOKENS
+   The page is intentionally neutral. The only saturated colour
+   is a colour the model has identified.
+   ═══════════════════════════════════════════════════════════ */
+:root{
+  --paper:#E9EAEB;
+  --card:#FFFFFF;
+  --ink:#17191C;
+  --muted:#62666C;
+  --rule:#CFD2D5;
+  --rule-soft:#DFE1E3;
+
+  --panel:#15171A;
+  --panel-2:#212429;
+  --panel-ink:#E9EBED;
+  --panel-mute:#9198A0;
+  --panel-rule:#31353B;
+
+  --red:#D8232A;
+  --yellow:#F5B301;
+  --blue:#1D5FD1;
+  --none:#8B9096;
+
+  --display:"Bricolage Grotesque","Helvetica Neue",sans-serif;
+  --sans:"Public Sans","Helvetica Neue",Arial,sans-serif;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+
+  --wrap:1180px;
+  --pad:clamp(16px,4vw,44px);
+  --sec:clamp(48px,7vw,104px);
+}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *{transition-duration:.01ms!important;animation-duration:.01ms!important}
+}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:var(--sans);font-size:clamp(15px,.55vw + 13.4px,17px);
+  line-height:1.6;-webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+h1,h2,h3,h4{margin:0;font-family:var(--display);font-weight:700;line-height:1.04;letter-spacing:-.022em}
+p{margin:0}
+ul,ol{margin:0;padding:0;list-style:none}
+a{color:inherit}
+img,video,canvas,svg{max-width:100%;display:block}
+:focus-visible{outline:2px solid var(--ink);outline-offset:3px;border-radius:3px}
+
+.wrap{width:100%;max-width:var(--wrap);margin-inline:auto;padding-inline:var(--pad)}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+/* ─── nav ─────────────────────────────────────────────── */
+.nav{
+  position:sticky;top:0;z-index:40;
+  background:color-mix(in srgb,var(--paper) 90%,transparent);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--rule);
+}
+.nav-in{display:flex;align-items:center;gap:clamp(10px,2vw,28px);min-height:56px}
+.brand{font-family:var(--display);font-weight:700;font-size:17px;letter-spacing:-.03em;text-decoration:none;white-space:nowrap;flex:none}
+.brand sup{font-family:var(--mono);font-size:9px;font-weight:400;color:var(--muted);margin-left:4px;vertical-align:super}
+.navlinks{
+  display:flex;gap:clamp(12px,2vw,24px);margin-left:auto;
+  overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none;
+  font-size:14px;padding:6px 0;
+  -webkit-mask-image:linear-gradient(to right,transparent,#000 12px,#000 calc(100% - 12px),transparent);
+          mask-image:linear-gradient(to right,transparent,#000 12px,#000 calc(100% - 12px),transparent);
+}
+.navlinks::-webkit-scrollbar{display:none}
+.navlinks a{
+  text-decoration:none;color:var(--muted);white-space:nowrap;
+  padding-bottom:3px;border-bottom:1.5px solid transparent;transition:color .15s,border-color .15s;
+}
+.navlinks a:hover{color:var(--ink)}
+.navlinks a.here{color:var(--ink);border-bottom-color:var(--ink);font-weight:600}
+@media(max-width:560px){.navlinks{margin-left:0}.nav-in{flex-wrap:wrap;padding-block:8px}}
+
+/* ─── section furniture ───────────────────────────────── */
+section{scroll-margin-top:70px}
+.sec{padding-block:var(--sec);border-top:1px solid var(--rule)}
+.eyebrow{
+  display:flex;align-items:baseline;gap:12px;margin-bottom:clamp(14px,2vw,20px);
+  font-size:12.5px;color:var(--muted);
+}
+.eyebrow b{font-weight:600;color:var(--ink);font-size:13px}
+.eyebrow span{font-family:var(--mono);font-size:11px;margin-left:auto;white-space:nowrap}
+.h2{font-size:clamp(1.65rem,3.4vw,2.7rem);max-width:20ch}
+.deck{margin-top:14px;color:var(--muted);max-width:62ch;font-size:clamp(15px,.5vw + 13.8px,17.5px)}
+.lede{max-width:70ch}
+
+/* ─── hero + scanner ──────────────────────────────────── */
+.hero{padding-block:clamp(34px,6vw,68px) var(--sec)}
+.hero h1{font-size:clamp(2.1rem,6.4vw,4rem);max-width:16ch}
+.hero-sub{margin-top:20px;color:var(--muted);max-width:54ch;font-size:clamp(15.5px,.6vw + 14px,18px)}
+.stats{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(112px,1fr));
+  margin-top:clamp(26px,4vw,38px);border-top:1px solid var(--rule);
+}
+.stat{padding:14px 14px 0 0;border-right:1px solid var(--rule)}
+.stat:last-child{border-right:0}
+.stat b{display:block;font-family:var(--display);font-size:clamp(1.15rem,1.6vw,1.5rem);letter-spacing:-.03em}
+.stat span{font-size:12.5px;color:var(--muted);display:block;margin-top:2px;line-height:1.35}
+
+.station{
+  margin-top:clamp(30px,5vw,52px);
+  background:var(--panel);color:var(--panel-ink);
+  border-radius:clamp(12px,1.6vw,18px);overflow:hidden;
+}
+.station-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr)}
+@media(max-width:880px){.station-grid{grid-template-columns:1fr}}
+
+.stage{position:relative;background:#0B0D0F;aspect-ratio:4/3;display:grid;place-items:center;overflow:hidden}
+.stage video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
+.stage video.rear{transform:none}
+.stage.off video{opacity:0}
+.reticle{
+  position:absolute;inset:50% auto auto 50%;translate:-50% -50%;
+  width:min(58%,268px);aspect-ratio:1;
+  border:2px solid rgba(255,255,255,.5);border-radius:8px;pointer-events:none;
+}
+.reticle::after{
+  content:"";position:absolute;inset:-1px;border-radius:8px;
+  box-shadow:0 0 0 100vmax rgba(8,10,12,.42);
+}
+.stage-msg{
+  position:absolute;inset-inline:0;bottom:0;padding:12px 14px;
+  font-size:13px;color:var(--panel-mute);background:linear-gradient(transparent,rgba(8,10,12,.85));
+}
+.stage-off{position:absolute;inset:0;display:grid;place-content:center;gap:8px;text-align:center;padding:24px}
+.stage-off p{color:var(--panel-mute);font-size:13.5px;max-width:34ch}
+.stage.on .stage-off{display:none}
+.stage.on .reticle{display:block}
+.stage:not(.on) .reticle{display:none}
+
+.readout{padding:clamp(16px,2.4vw,26px);display:flex;flex-direction:column;gap:18px;min-width:0}
+.verdict{border-bottom:1px solid var(--panel-rule);padding-bottom:16px}
+.verdict-label{font-size:11.5px;color:var(--panel-mute);letter-spacing:.02em}
+.verdict-name{
+  font-family:var(--display);font-size:clamp(2rem,7vw,3.4rem);line-height:1;
+  letter-spacing:-.035em;margin-top:6px;overflow-wrap:break-word;
+}
+.verdict-note{font-size:13px;color:var(--panel-mute);margin-top:8px;min-height:1.4em}
+.badge{
+  display:inline-block;font-family:var(--mono);font-size:10px;
+  padding:2px 7px;border:1px solid var(--panel-rule);border-radius:999px;
+  color:var(--panel-mute);margin-top:10px;
+}
+
+.bars{display:grid;gap:9px}
+.bar-h{font-size:11.5px;color:var(--panel-mute);margin-bottom:2px}
+.bar{display:grid;grid-template-columns:minmax(52px,auto) 1fr minmax(38px,auto);gap:10px;align-items:center;font-size:13px}
+.bar .t{height:9px;background:var(--panel-2);border-radius:3px;overflow:hidden}
+.bar .f{height:100%;width:0;border-radius:3px;transition:width .22s ease-out}
+.bar .v{font-family:var(--mono);font-size:12px;text-align:right;color:var(--panel-mute)}
+
+.huebar{margin-top:2px}
+.huestrip{
+  height:10px;border-radius:3px;position:relative;
+  background:linear-gradient(90deg,#f00 0%,#ff0 16.6%,#0f0 33.3%,#0ff 50%,#00f 66.6%,#f0f 83.3%,#f00 100%);
+}
+.huemark{position:absolute;top:-4px;width:2px;height:18px;background:#fff;border-radius:1px;left:0;transition:left .22s ease-out;box-shadow:0 0 0 1px rgba(0,0,0,.45)}
+.huelabels{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;color:var(--panel-mute);margin-top:6px}
+
+.controls{display:flex;flex-wrap:wrap;gap:8px;padding:0 clamp(16px,2.4vw,26px) clamp(16px,2.4vw,26px)}
+.btn{
+  font:inherit;font-size:13.5px;font-weight:600;font-family:var(--sans);
+  padding:9px 15px;border-radius:7px;cursor:pointer;
+  background:var(--panel-ink);color:var(--panel);border:1px solid var(--panel-ink);
+  transition:background .15s,color .15s;
+}
+.btn:hover{background:#fff}
+.btn.ghost{background:transparent;color:var(--panel-ink);border-color:var(--panel-rule)}
+.btn.ghost:hover{background:var(--panel-2)}
+.btn[aria-pressed="true"]{background:var(--panel-ink);color:var(--panel);border-color:var(--panel-ink)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+
+.hookup{
+  border-top:1px solid var(--panel-rule);padding:clamp(14px,2.2vw,20px) clamp(16px,2.4vw,26px);
+  display:flex;flex-wrap:wrap;gap:10px;align-items:center;
+}
+.hookup label{font-size:12.5px;color:var(--panel-mute);flex:1 1 100%}
+.hookup input{
+  font:inherit;font-family:var(--mono);font-size:12.5px;flex:1 1 260px;min-width:0;
+  padding:9px 12px;border-radius:7px;
+  background:var(--panel-2);border:1px solid var(--panel-rule);color:var(--panel-ink);
+}
+.hookup input::placeholder{color:#6B7178}
+.classnote{flex:1 1 100%;font-family:var(--mono);font-size:11.5px;line-height:1.55;color:var(--panel-mute);margin:2px 0 0;overflow-wrap:anywhere}
+
+/* ─── rationale ───────────────────────────────────────── */
+.rationale{max-width:68ch}
+.rationale p{margin-top:1.15em}
+.rationale p:first-of-type{margin-top:0}
+.rationale p:first-of-type::first-line{font-weight:500}
+.pull{
+  margin:clamp(26px,4vw,40px) 0;padding:20px 0;
+  border-block:1px solid var(--rule);
+  font-family:var(--display);font-size:clamp(1.15rem,2.4vw,1.6rem);
+  line-height:1.25;letter-spacing:-.02em;max-width:24ch;
+}
+
+/* ─── generic blocks ──────────────────────────────────── */
+.cols{display:grid;gap:clamp(18px,2.5vw,30px);grid-template-columns:repeat(auto-fit,minmax(min(100%,248px),1fr))}
+.blk{border-top:2px solid var(--ink);padding-top:14px}
+.blk h3{font-size:1.02rem;letter-spacing:-.015em}
+.blk p{margin-top:7px;color:var(--muted);font-size:14.5px}
+
+.classes{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(min(100%,215px),1fr))}
+.cls{background:var(--card);border:1px solid var(--rule);border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
+.cls-chip{height:76px}
+.cls-body{padding:14px 16px 16px}
+.cls-body h3{font-size:1.05rem}
+.cls-hue{font-family:var(--mono);font-size:11px;color:var(--muted);display:block;margin-bottom:6px}
+.cls-body p{margin-top:6px;color:var(--muted);font-size:13.8px}
+
+/* naming convention */
+.naming{
+  display:flex;flex-wrap:wrap;gap:6px;align-items:center;
+  font-family:var(--mono);font-size:clamp(13px,1.8vw,18px);
+  background:var(--card);border:1px solid var(--rule);border-radius:10px;
+  padding:clamp(12px,2vw,18px);overflow-wrap:anywhere;
+}
+.naming i{font-style:normal;color:var(--muted)}
+.naming b{font-weight:600}
+.namekey{display:grid;gap:0;margin-top:18px;grid-template-columns:repeat(auto-fit,minmax(min(100%,215px),1fr))}
+.namekey div{border-top:1px solid var(--rule);padding:12px 16px 12px 0}
+.namekey dt{font-family:var(--mono);font-size:12.5px;font-weight:600;margin-bottom:3px}
+.namekey dd{margin:0;color:var(--muted);font-size:14px}
+
+/* tables that survive small screens */
+.tbl-wrap{margin-top:clamp(16px,2.4vw,24px)}
+table.tbl{width:100%;border-collapse:collapse;font-size:14.5px}
+table.tbl caption{text-align:left;font-size:12.5px;color:var(--muted);padding-bottom:10px}
+table.tbl th{
+  text-align:left;font-weight:600;font-size:12.5px;color:var(--muted);
+  padding:0 14px 9px 0;border-bottom:1.5px solid var(--ink);vertical-align:bottom;
+}
+table.tbl td{padding:13px 14px 13px 0;border-bottom:1px solid var(--rule);vertical-align:top}
+table.tbl td:last-child,table.tbl th:last-child{padding-right:0}
+table.tbl b{font-weight:600}
+.st{display:inline-flex;align-items:center;gap:7px;white-space:nowrap;font-weight:600;font-size:13.5px}
+.st i{width:8px;height:8px;border-radius:2px;flex:none}
+@media(max-width:720px){
+  table.tbl,table.tbl tbody,table.tbl tr,table.tbl td{display:block;width:100%}
+  table.tbl thead{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  table.tbl tr{
+    background:var(--card);border:1px solid var(--rule);border-radius:11px;
+    padding:14px 16px;margin-bottom:10px;
+  }
+  table.tbl td{border:0;padding:7px 0}
+  table.tbl td+td{border-top:1px solid var(--rule-soft)}
+  table.tbl td::before{
+    content:attr(data-l);display:block;font-size:11.5px;color:var(--muted);
+    margin-bottom:3px;font-weight:500;
+  }
+}
+
+/* dataset matrix */
+.matrix{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(min(100%,215px),1fr));margin-top:clamp(18px,2.5vw,26px)}
+.axis{background:var(--card);border:1px solid var(--rule);border-radius:12px;padding:16px 18px}
+.axis-top{display:flex;align-items:baseline;justify-content:space-between;gap:10px;border-bottom:1px solid var(--rule);padding-bottom:10px}
+.axis-top h3{font-size:.98rem}
+.axis-top b{font-family:var(--display);font-size:1.5rem;letter-spacing:-.03em}
+.axis ul{margin-top:10px;display:grid;gap:6px}
+.axis li{font-size:13.8px;color:var(--muted);padding-left:15px;position:relative}
+.axis li::before{content:"";position:absolute;left:0;top:.66em;width:7px;height:1.5px;background:var(--rule)}
+.sum{
+  margin-top:16px;font-family:var(--mono);font-size:clamp(12.5px,1.6vw,14px);
+  color:var(--muted);display:flex;flex-wrap:wrap;gap:6px;align-items:center;
+}
+.sum b{color:var(--ink);font-weight:600}
+
+/* test protocol */
+.tests{display:grid;gap:9px;margin-top:clamp(16px,2.4vw,24px)}
+.test{
+  display:grid;gap:4px 16px;align-items:center;
+  grid-template-columns:38px minmax(0,1fr) auto;
+  background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:13px 16px;
+}
+.test .n{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.test .what{font-weight:600;font-size:14.8px;min-width:0}
+.test .what span{display:block;font-weight:400;color:var(--muted);font-size:13.3px;margin-top:2px}
+.test .exp{font-family:var(--mono);font-size:12px;color:var(--muted);text-align:right;white-space:nowrap}
+@media(max-width:620px){
+  .test{grid-template-columns:32px minmax(0,1fr)}
+  .test .exp{grid-column:2;text-align:left;white-space:normal}
+}
+
+/* credits */
+.people{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(min(100%,175px),1fr));margin-top:20px}
+.person{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--rule);border-radius:11px;padding:13px 15px}
+.avatar{
+  width:38px;height:38px;border-radius:9px;flex:none;display:grid;place-items:center;
+  background:var(--ink);color:var(--paper);font-family:var(--mono);font-size:12.5px;font-weight:600;
+}
+.person b{display:block;font-size:14.5px;font-weight:600;line-height:1.25}
+.person span{font-size:12.5px;color:var(--muted)}
+
+/* footer */
+.foot{border-top:1px solid var(--rule);padding-block:34px 54px;font-size:13.5px;color:var(--muted)}
+.foot-in{display:flex;flex-wrap:wrap;gap:14px 28px;justify-content:space-between;align-items:baseline}
+.foot b{color:var(--ink);font-weight:600}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap nav-in">
+    <a class="brand" href="#top">ChromaSee<sup>V1</sup></a>
+    <nav class="navlinks" id="navlinks" aria-label="Sections">
+      <a href="#scanner">Scanner</a>
+      <a href="#rationale">Rationale</a>
+      <a href="#model">The model</a>
+      <a href="#logic">How it decides</a>
+      <a href="#data">The dataset</a>
+      <a href="#testing">Testing</a>
+      <a href="#credits">Credits</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+
+<!-- ══════════ HERO + SCANNER ══════════ -->
+<section id="scanner" class="hero">
+  <div class="wrap">
+    <h1>Hold up an object. ChromaSee names the colour.</h1>
+    <p class="hero-sub">A teachable image classifier that reads an object's colour from a live camera and says it out loud. Built for learners with colour vision deficiency. Everything runs on the device — no account, no upload, no image of a learner ever leaves the browser.</p>
+
+    <div class="stats">
+      <div class="stat"><b>4</b><span>Classes, including Nothing</span></div>
+      <div class="stat"><b>300</b><span>Training images</span></div>
+      <div class="stat"><b>224 × 224</b><span>RGB input</span></div>
+      <div class="stat"><b>85%</b><span>Announce threshold</span></div>
+      <div class="stat"><b>On-device</b><span>No frame is uploaded</span></div>
+    </div>
+
+    <div class="station">
+      <div class="station-grid">
+        <div class="stage" id="stage">
+          <video id="video" playsinline muted autoplay></video>
+          <div class="reticle"></div>
+          <div class="stage-off">
+            <b style="font-family:var(--display);font-size:1.15rem">Camera is off</b>
+            <p>Start the camera, then hold one object inside the square. A laptop webcam or a phone's rear camera both work.</p>
+          </div>
+          <div class="stage-msg" id="stageMsg">Camera off</div>
+        </div>
+
+        <div class="readout">
+          <div class="verdict">
+            <div class="verdict-label">Result</div>
+            <div class="verdict-name" id="vName" aria-live="polite">—</div>
+            <div class="verdict-note" id="vNote">Start the camera to begin.</div>
+            <span class="badge" id="engineBadge">no engine</span>
+          </div>
+
+          <div>
+            <div class="bar-h">Class confidence</div>
+            <div class="bars" id="bars"></div>
+          </div>
+
+          <div class="huebar">
+            <div class="bar-h">Hue position</div>
+            <div class="huestrip"><span class="huemark" id="hueMark"></span></div>
+            <div class="huelabels"><span>0°</span><span>60°</span><span>120°</span><span>180°</span><span>240°</span><span>300°</span><span>360°</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button class="btn" id="btnStart">Start camera</button>
+        <button class="btn ghost" id="btnStop" disabled>Stop</button>
+        <button class="btn ghost" id="btnFlip" disabled>Flip camera</button>
+        <button class="btn ghost" id="btnSpeak" aria-pressed="false">Speak result</button>
+      </div>
+
+      <div class="hookup">
+        <label for="modelUrl">Trained model — this loads on its own when the page opens. Paste a different Teachable Machine share link to swap in a retrained version. If a network ever blocks it mid-demonstration, the scanner falls back to a built-in hue engine and the badge above says which of the two produced the reading.</label>
+        <input id="modelUrl" type="url" placeholder="https://teachablemachine.withgoogle.com/models/xxxxxxxx/" autocomplete="off" spellcheck="false">
+        <button class="btn" id="btnConnect">Connect model</button>
+        <p class="classnote" id="classNote">Loading the trained model…</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ RATIONALE ══════════ -->
+<section id="rationale" class="sec">
+  <div class="wrap">
+    <div class="eyebrow"><b>Why ChromaSee exists</b><span>Rationale</span></div>
+    <h2 class="h2">Colour blindness is common, largely undiagnosed, and rarely accommodated.</h2>
+
+    <div class="rationale" style="margin-top:clamp(24px,3.5vw,40px)">
+      <p>Color vision deficiency (CVD), commonly known as color blindness, is among the most widespread inherited conditions in the world and among the least accommodated. A systematic review and meta-analysis drawing on more than 1.7 million participants across 56 studies and 21 countries placed the global prevalence of congenital CVD at 2.59 percent among children and adolescents, rising to 4.38 percent among males. In populations of Northern European descent, red–green deficiency reaches approximately 8 percent of males and 0.5 percent of females. Taken together, prevailing estimates place the number of affected individuals worldwide at roughly 300 million. The condition is not a marginal case; it describes a population larger than that of most nations on earth, distributed across every region and every income level.</p>
+
+      <p>Prevalence, however, is not uniform. Rates reported in Asian and African populations are generally lower than those observed in European ones, with figures for Chinese males ranging from 4.0 to 6.9 percent and Japanese males near 4.0 percent. Philippine data fall within this range. A screening of 1,258 male students in a public high school identified color-vision deficiency in 5.17 percent of participants, of whom 98 percent were classified as deutan, the subtype associated with the medium-wavelength cone. Applied to national population figures, a rate of this order implies that several million Filipinos live with some degree of CVD. The condition is therefore neither rare nor foreign to the setting in which this study was conducted.</p>
+
+      <div class="pull">Fewer than one in five students found to be colour deficient had known of it beforehand.</div>
+
+      <p>What makes these figures consequential is how little of the affected population is ever identified. CVD is congenital in the overwhelming majority of cases, yet diagnosis is routinely delayed until school age or later because color-vision screening is not standard practice in many health and education systems. Awareness among those affected is correspondingly poor; in one school-based study, fewer than one in five students found to be color deficient had known of their condition beforehand. Where screening is not mandated, individuals commonly discover the deficiency only after repeated failure at color-dependent tasks, or at the point where an occupational requirement excludes them from a field they have already trained for.</p>
+
+      <p>The costs of that invisibility accumulate quietly. In the classroom, color-coded charts, maps, diagrams, and laboratory materials place undiagnosed learners at a measurable disadvantage, and their mistakes are frequently misread as inattention or carelessness rather than as a sensory limitation. In ordinary life, the same difficulty extends to judging the ripeness of produce, matching clothing, reading appliance indicator lights, distinguishing wire insulation, and interpreting color-coded medication and safety labels. Occupationally the constraint becomes explicit: in one surveyed sample, 34 percent of respondents with CVD reported that the condition had shaped their career choices, and 24 percent had been barred outright from specific occupations, including transport, policing, and electronics.</p>
+
+      <p>Existing responses fall into two broad groups, and neither closes the gap. Corrective and simulative approaches — tinted lenses and display filters — alter how colors appear to the wearer or viewer, but they do not tell the user what a color actually is, and their benefit varies substantially by deficiency type and severity. Identification tools come closer to the practical need, and the use of such applications is a recognized and growing coping strategy among people with CVD. Their weakness is methodological. Most sample pixels from a camera feed and map the values to a name using fixed thresholds in a color space such as RGB or HSL, which ties accuracy directly to illumination: warm indoor lighting, shadow, glare, and reflective or metallic surfaces shift the sampled values and shift the returned label with them. Naming is likewise poorly calibrated, with some tools returning labels too specific to act on and others too coarse to separate the hues users most often confuse.</p>
+
+      <p>This gap motivates the present study. A model trained on labelled images, rather than one governed by fixed thresholds, can learn the relationship between what a camera captures and the name a person would assign to that color across the varied lighting conditions in which the tool will actually be used. The researchers therefore developed ChromaSee, a machine-learning model that identifies the dominant color of an object presented to a camera and returns its common name in real time. The system is designed to run on devices the intended users already own, requiring no specialized optics, no dedicated hardware, and no clinical supervision.</p>
+
+      <p>The study carries significance for several groups. For individuals with CVD, it offers an immediate and low-cost means of verifying a color independently, without depending on another person's eyes. For teachers and learners, it provides a way to make existing color-dependent instructional materials usable without redesigning them. For workers in trades where color coding carries safety information, it supplies a check that does not rest on color perception. More broadly, the study contributes a locally collected and labelled image dataset and an evaluation of model performance under everyday lighting conditions — a shortcoming that users of existing tools report consistently but that published work has rarely measured.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ THE MODEL ══════════ -->
+<section id="model" class="sec">
+  <div class="wrap">
+    <div class="eyebrow"><b>Inside the model</b><span>Architecture</span></div>
+    <h2 class="h2">Four classes, and one of them is "Nothing".</h2>
+    <p class="deck">Three colour classes alone would force the model to spread its full confidence across red, yellow and blue even when the desk is empty. An empty desk reading "Red — 100%" is a false positive, and for an assistive tool that is the worst failure available: the learner trusts an answer that was never real.</p>
+
+    <div class="classes" style="margin-top:clamp(22px,3vw,34px)">
+      <article class="cls">
+        <div class="cls-chip" style="background:var(--red)"></div>
+        <div class="cls-body">
+          <span class="cls-hue">HUE ≈ 0°</span>
+          <h3>Red</h3>
+          <p>Paper, crayon, cloth, plastic, folder. Red and yellow sit only 60° apart, and that pair is the confusion axis for red–green CVD — the most common type.</p>
+        </div>
+      </article>
+      <article class="cls">
+        <div class="cls-chip" style="background:var(--yellow)"></div>
+        <div class="cls-body">
+          <span class="cls-hue">HUE ≈ 55°</span>
+          <h3>Yellow</h3>
+          <p>The same five object types in yellow. Sits opposite blue on the tritan axis and close to red on the other, so it borders both confusions.</p>
+        </div>
+      </article>
+      <article class="cls">
+        <div class="cls-chip" style="background:var(--blue)"></div>
+        <div class="cls-body">
+          <span class="cls-hue">HUE ≈ 220°</span>
+          <h3>Blue</h3>
+          <p>The same five object types in blue. Maximally distant from yellow on the wheel, which makes it the most stable of the three classes.</p>
+        </div>
+      </article>
+      <article class="cls">
+        <div class="cls-chip" style="background:var(--none)"></div>
+        <div class="cls-body">
+          <span class="cls-hue">DEFAULT STATE</span>
+          <h3>Nothing</h3>
+          <p>Empty desk, bare hand, blank wall, neutral surfaces. Gives the model somewhere legitimate to put its confidence so the interface can stay quiet.</p>
+        </div>
+      </article>
+    </div>
+
+    <h3 style="margin-top:clamp(34px,5vw,56px);font-size:1.15rem">Naming convention</h3>
+    <p class="deck" style="margin-top:8px">Domain, problem, function, version. The version suffix is deliberate — a trained model is not a one-time build, and V2 is already scoped.</p>
+    <div class="naming" style="margin-top:14px">
+      <b>ChromaSee</b><i>_</i><b>PrimaryColor</b><i>_</i><b>Classifier</b><i>_</i><b>V1</b>
+    </div>
+    <dl class="namekey">
+      <div><dt>ChromaSee</dt><dd>The tool, in the accessibility domain.</dd></div>
+      <div><dt>PrimaryColor</dt><dd>The exact scope — red, yellow, blue, and nothing wider.</dd></div>
+      <div><dt>Classifier</dt><dd>The task performed: multi-class image classification.</dd></div>
+      <div><dt>V1</dt><dd>Marks an iterative model with a planned retraining cycle.</dd></div>
+    </dl>
+
+    <h3 style="margin-top:clamp(34px,5vw,56px);font-size:1.15rem">Project configuration</h3>
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <caption>Configuration settings and the reason behind each</caption>
+        <thead><tr><th scope="col">Setting</th><th scope="col">Choice</th><th scope="col">Why</th></tr></thead>
+        <tbody>
+          <tr>
+            <td data-l="Setting"><b>Project type</b></td>
+            <td data-l="Choice">Image project</td>
+            <td data-l="Why">The input is a live camera feed of physical objects.</td>
+          </tr>
+          <tr>
+            <td data-l="Setting"><b>Model variant</b></td>
+            <td data-l="Choice">Standard image model (RGB)</td>
+            <td data-l="Why">The decision the whole project rests on. The embedded variant outputs grayscale, which mathematically destroys hue — the one feature this model exists to read.</td>
+          </tr>
+          <tr>
+            <td data-l="Setting"><b>Input resolution</b></td>
+            <td data-l="Choice">224 × 224 px, 3-channel RGB</td>
+            <td data-l="Why">Teachable Machine's native input size.</td>
+          </tr>
+          <tr>
+            <td data-l="Setting"><b>Processing location</b></td>
+            <td data-l="Choice">Browser, on-device</td>
+            <td data-l="Why">No image of a minor leaves the machine, which is what keeps this compliant with the Data Privacy Act of 2012.</td>
+          </tr>
+          <tr>
+            <td data-l="Setting"><b>Export target</b></td>
+            <td data-l="Choice">TensorFlow.js</td>
+            <td data-l="Why">Runs in any browser on hardware the school already owns. No server, no licence.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 style="margin-top:clamp(34px,5vw,56px);font-size:1.15rem">Why a trained model instead of a rule</h3>
+    <p class="deck" style="margin-top:8px">The obvious approach is a threshold: if the hex value is near #FF0000, say red. It collapses in a real room, because every one of these conditions moves the pixels.</p>
+    <div class="cols" style="margin-top:clamp(20px,3vw,30px)">
+      <div class="blk"><h3>Warm light</h3><p>A desk lamp or late afternoon shifts the whole frame toward yellow-red. This alone can push a red object's pixels into the yellow range.</p></div>
+      <div class="blk"><h3>Fluorescent ceiling</h3><p>Shifts the opposite way, toward green-blue, and flattens the separation between classes.</p></div>
+      <div class="blk"><h3>Hand shadow</h3><p>Brightness drops sharply and the hue reading turns noisy frame to frame.</p></div>
+      <div class="blk"><h3>Gloss and lamination</h3><p>Specular highlights read as near-white and wash the sample out entirely.</p></div>
+      <div class="blk"><h3>Distance</h3><p>The object occupies a different share of the frame, so background pixels start to dominate the average.</p></div>
+      <div class="blk"><h3>The fix scales differently</h3><p>A rule fails and you rewrite conditions. A classifier fails and you show it more of what it got wrong — a repair a teacher can perform without touching code.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ DECISION LOGIC ══════════ -->
+<section id="logic" class="sec">
+  <div class="wrap">
+    <div class="eyebrow"><b>How it decides</b><span>Deployment logic</span></div>
+    <h2 class="h2">A wrong answer stated confidently is worse than no answer.</h2>
+    <p class="deck">Every frame returns four confidences. Three guards stand between that and a spoken result, and only a reading that clears all three is ever announced to a learner. The 85% threshold is deliberately conservative.</p>
+
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <caption>Model output and the resulting behaviour</caption>
+        <thead><tr><th scope="col">Model output</th><th scope="col">What ChromaSee does</th><th scope="col">State</th></tr></thead>
+        <tbody>
+          <tr>
+            <td data-l="Model output">Top class is <b>Nothing</b></td>
+            <td data-l="What ChromaSee does">Stays quiet. Shows "Show me an object."</td>
+            <td data-l="State"><span class="st"><i style="background:var(--none)"></i>Idle</span></td>
+          </tr>
+          <tr>
+            <td data-l="Model output">Colour class, <b>85% or higher</b></td>
+            <td data-l="What ChromaSee does">Announces. Large colour name, plus speech when enabled.</td>
+            <td data-l="State"><span class="st"><i style="background:var(--blue)"></i>Announce</span></td>
+          </tr>
+          <tr>
+            <td data-l="Model output">Colour class, 60–84%</td>
+            <td data-l="What ChromaSee does">"Hold steady — move closer or into better light." No colour is named.</td>
+            <td data-l="State"><span class="st"><i style="background:var(--yellow)"></i>Hold</span></td>
+          </tr>
+          <tr>
+            <td data-l="Model output">Two classes within 15% of each other</td>
+            <td data-l="What ChromaSee does">"This is not a primary colour." The correct answer for an orange or green object, and logged toward V2.</td>
+            <td data-l="State"><span class="st"><i style="background:var(--red)"></i>Out of scope</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="cols" style="margin-top:clamp(28px,4vw,44px)">
+      <div class="blk"><h3>The split rule earns its keep</h3><p>An orange object has no correct class in a three-colour model. Saying so out loud turns a limitation into honest behaviour instead of a silent error.</p></div>
+      <div class="blk"><h3>One object at a time</h3><p>Teachable Machine returns a class and a confidence, nothing else. It cannot say where in the frame the colour is, so V1 assumes a single object presented to the camera.</p></div>
+      <div class="blk"><h3>Classroom scale, not district scale</h3><p>No accounts, no analytics, no server. At district size a coded pipeline would eventually be required, and that is a deliberate boundary rather than an oversight.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ DATASET ══════════ -->
+<section id="data" class="sec">
+  <div class="wrap">
+    <div class="eyebrow"><b>The dataset</b><span>Capture design</span></div>
+    <h2 class="h2">75 samples per class, and the variance is designed rather than accidental.</h2>
+    <p class="deck">Every class is built from the same matrix: three lighting conditions, five object types, five angles and distances.</p>
+
+    <div class="matrix">
+      <div class="axis">
+        <div class="axis-top"><h3>Lighting</h3><b>3</b></div>
+        <ul>
+          <li>Cool — daylight beside the window</li>
+          <li>Neutral — overhead fluorescent or LED</li>
+          <li>Warm — desk lamp or late afternoon</li>
+        </ul>
+      </div>
+      <div class="axis">
+        <div class="axis-top"><h3>Object type</h3><b>5</b></div>
+        <ul>
+          <li>Bond paper</li><li>Crayon or marker</li><li>Cloth or shirt</li><li>Plastic item</li><li>Folder or book cover</li>
+        </ul>
+      </div>
+      <div class="axis">
+        <div class="axis-top"><h3>Angle · distance</h3><b>5</b></div>
+        <ul>
+          <li>Flat-on</li><li>Tilted left</li><li>Tilted right</li><li>Close, about 15 cm</li><li>Far, about 40 cm</li>
+        </ul>
+      </div>
+    </div>
+
+    <p class="sum"><b>3</b> × <b>5</b> × <b>5</b> = <b>75</b> images per class · <b>300</b> in total · roughly <b>5.4 MB</b></p>
+
+    <h3 style="margin-top:clamp(34px,5vw,56px);font-size:1.15rem">Warm light is mandatory, not optional</h3>
+    <p class="deck" style="margin-top:8px">Warm light pushes red pixels toward yellow, and red ↔ yellow is the tightest boundary in this model at only 60° of separation. Training under warm light is what keeps that boundary stable — the model meets its hardest case during training rather than during the demonstration.</p>
+
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <caption>Each control prevents one specific failure</caption>
+        <thead><tr><th scope="col">Control</th><th scope="col">Failure it prevents</th></tr></thead>
+        <tbody>
+          <tr><td data-l="Control"><b>Five object types per colour</b></td><td data-l="Prevents">The model learning shape instead of colour. Train only on a red crayon and a red shirt will fail.</td></tr>
+          <tr><td data-l="Control"><b>Three lighting conditions</b></td><td data-l="Prevents">A model that only works at the hour it was trained, with red collapsing into yellow under lamp light.</td></tr>
+          <tr><td data-l="Control"><b>Varied backgrounds</b></td><td data-l="Prevents">The model keying on background pixels that happen to correlate with one class.</td></tr>
+          <tr><td data-l="Control"><b>Object fills 60–70% of frame</b></td><td data-l="Prevents">Too little signal from the target colour, letting the background dominate.</td></tr>
+          <tr><td data-l="Control"><b>Different hands recording</b></td><td data-l="Prevents">The model learning one trainer's skin tone as a feature — the clearest bias risk in a held-object dataset.</td></tr>
+          <tr><td data-l="Control"><b>Identical object set across colours</b></td><td data-l="Prevents">Imbalance in object variety. Every colour uses the same five material types.</td></tr>
+          <tr><td data-l="Control"><b>No orange or green materials</b></td><td data-l="Prevents">Contaminating the red/yellow and yellow/blue boundaries with in-between hues.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ TESTING ══════════ -->
+<section id="testing" class="sec">
+  <div class="wrap">
+    <div class="eyebrow"><b>Testing</b><span>Live protocol</span></div>
+    <h2 class="h2">Tested with objects the model has never seen.</h2>
+    <p class="deck">Run the scanner at the top of the page against each of these, and record what it actually returns rather than what it should return.</p>
+
+    <div class="tests">
+      <div class="test"><span class="n">01</span><span class="what">Red ballpen<span>Everyday object, neutral light</span></span><span class="exp">Red ≥ 85%</span></div>
+      <div class="test"><span class="n">02</span><span class="what">Yellow highlighter<span>Small, saturated, slightly glossy</span></span><span class="exp">Yellow ≥ 85%</span></div>
+      <div class="test"><span class="n">03</span><span class="what">Blue notebook<span>Large flat surface</span></span><span class="exp">Blue ≥ 85%</span></div>
+      <div class="test"><span class="n">04</span><span class="what">Empty desk<span>No object in frame</span></span><span class="exp">Nothing</span></div>
+      <div class="test"><span class="n">05</span><span class="what">Bare hand<span>Skin tone must not read as a colour class</span></span><span class="exp">Nothing</span></div>
+      <div class="test"><span class="n">06</span><span class="what">Red object under warm lamp<span>The hardest case in the whole set</span></span><span class="exp">Red ≥ 85%</span></div>
+      <div class="test"><span class="n">07</span><span class="what">Yellow object at 40 cm<span>Background competes for the frame</span></span><span class="exp">Yellow ≥ 85%</span></div>
+      <div class="test"><span class="n">08</span><span class="what">Orange object<span>Deliberately has no correct class</span></span><span class="exp">Split → out of scope</span></div>
+    </div>
+
+    <p class="deck" style="margin-top:22px"><b>On test 8.</b> The orange object is supposed to fail to reach the threshold. Test 8 passing is evidence that the confidence logic works, not evidence that the model is broken — an orange object genuinely has no correct class in a three-colour model, and saying so is the honest answer.</p>
+
+    <h3 style="margin-top:clamp(34px,5vw,56px);font-size:1.15rem">If a test fails, the fix is almost always more examples</h3>
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <caption>Symptom, diagnosis, fix</caption>
+        <thead><tr><th scope="col">Symptom</th><th scope="col">Diagnosis</th><th scope="col">Fix</th></tr></thead>
+        <tbody>
+          <tr><td data-l="Symptom"><b>Empty frame reads as a colour</b></td><td data-l="Diagnosis">Nothing class undertrained</td><td data-l="Fix">Record 75 more background samples and retrain.</td></tr>
+          <tr><td data-l="Symptom"><b>Red reads as yellow under lamp light</b></td><td data-l="Diagnosis">Too few warm-light samples in Red</td><td data-l="Fix">Add 25 more Red samples under warm light only, then retrain.</td></tr>
+          <tr><td data-l="Symptom"><b>Confidence flickers 70/30</b></td><td data-l="Diagnosis">Overlapping features, usually shared lighting or background</td><td data-l="Fix">Recapture the weaker class against more varied backgrounds.</td></tr>
+          <tr><td data-l="Symptom"><b>Works at the training desk only</b></td><td data-l="Diagnosis">The model memorised the room, not the colour</td><td data-l="Fix">Add samples from a second location.</td></tr>
+          <tr><td data-l="Symptom"><b>Fails on a shiny object</b></td><td data-l="Diagnosis">Specular highlight reads as white</td><td data-l="Fix">Add glossy samples to that class and angle away from the glare.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ CREDITS ══════════ -->
+<section id="credits" class="sec">
+  <div class="wrap">
+    <div class="eyebrow"><b>Credits</b><span>Team</span></div>
+    <h2 class="h2">Built for Empowerment Technologies</h2>
+    <p class="deck">Performance task — No-Code AI Development. ChromaSee_PrimaryColor_Classifier_V1 was trained on Teachable Machine using the standard image model, exported to TensorFlow.js, and is loaded live by this page.</p>
+
+    <div class="people" id="people"></div>
+
+    <dl class="namekey" id="classMeta" style="margin-top:clamp(20px,3vw,28px)"></dl>
+
+    <div class="cols" style="margin-top:clamp(30px,4vw,44px)">
+      <div class="blk"><h3>V1 — current</h3><p>Red, yellow, blue and Nothing, with the 85% announce threshold and split-confidence handling.</p></div>
+      <div class="blk"><h3>V2 — scoped</h3><p>Orange, green and purple at 75 samples each: the colours V1 deliberately reports as out of scope. Triggered once V1 holds above 85% across two weeks of real use.</p></div>
+      <div class="blk"><h3>V3 — planned</h3><p>Colour-mixing verification. The learner mixes two primaries and ChromaSee confirms the secondary that results.</p></div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot"><div class="wrap foot-in">
+  <span><b>ChromaSee</b> — a teachable colour classifier for learners with colour vision deficiency.</span>
+  <span id="footNames"></span>
+</div></footer>
+
+<canvas id="sampler" width="72" height="72" style="display:none"></canvas>
+
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.3.1/dist/tf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8/dist/teachablemachine-image.min.js"></script>
+<script>
+/* ═══════════════════════════════════════════════════════════
+   EDIT HERE — team names and the trained model link.
+   Everything else is plain HTML above; edit the text directly.
+   ═══════════════════════════════════════════════════════════ */
+const TEAM = [
+  { name:"John Louise A. Marcos",   role:"Creator" },
+  { name:"Carlos Arthuro J. Abion", role:"Creator" },
+  { name:"Sweet Melanie C. Unida",  role:"Creator" },
+  { name:"Janela Eunice J. Zuniga", role:"Creator" }
+];
+const CLASS_INFO = {
+  "Subject":      "Empowerment Technologies",
+  "Grade & section": "Grade 12 — Faraday",
+  "Model":        "ChromaSee_PrimaryColor_Classifier_V1",
+  "Date trained": ""            // fill in, e.g. "29 August 2026" — the row hides while empty
+};
+const MODEL_URL = "https://teachablemachine.withgoogle.com/models/cGWKTLlZE/";
+const HUE_ANCHORS = { Red:0, Yellow:55, Blue:220 };
+const ANNOUNCE = 0.85, HOLD = 0.60, SPLIT = 0.15;
+
+/* The scanner reads the class names out of your model rather than assuming
+   them. These patterns work out what each name MEANS, so the colours and the
+   decision logic line up. Add your own wording here if you retrain with
+   Filipino labels or a different naming scheme. */
+const ROLES = [
+  ["Red",     /red|pula/i],
+  ["Yellow",  /yellow|dilaw/i],
+  ["Blue",    /blue|asul|bughaw/i],
+  ["Nothing", /noth|none|empty|blank|backgro|neutral|wala/i]
+];
+const DEFAULT_LABELS = ["Red","Yellow","Blue","Nothing"];
+/* ═════════════════════════════════════════════════════════ */
+
+(function(){
+  const $ = id => document.getElementById(id);
+  const COLORS = { Red:"var(--red)", Yellow:"var(--yellow)", Blue:"var(--blue)", Nothing:"var(--none)", Other:"#5A6068" };
+  const roleOf = label => (ROLES.find(([,re]) => re.test(label)) || ["Other"])[0];
+  let CLASSES = [];
+
+  /* ---- credits ---- */
+  const initials = n => {
+    const w = n.trim().split(/\s+/).filter(p => !/^[A-Z]\.$/.test(p));
+    const a = (w[0] || "")[0] || "", b = (w[w.length-1] || "")[0] || "";
+    return (w.length > 1 ? a + b : a).toUpperCase() || "··";
+  };
+  TEAM.forEach(p=>{
+    const d = document.createElement("div"); d.className="person";
+    d.innerHTML = '<span class="avatar"></span><span><b></b><span></span></span>';
+    d.querySelector(".avatar").textContent = initials(p.name);
+    d.querySelector("b").textContent = p.name;
+    d.querySelector("span span").textContent = p.role;
+    $("people").appendChild(d);
+  });
+  Object.entries(CLASS_INFO).forEach(([k,v])=>{
+    if(!v) return;
+    const row = document.createElement("div");
+    const dt = document.createElement("dt"); dt.textContent = k;
+    const dd = document.createElement("dd"); dd.textContent = v;
+    row.append(dt, dd); $("classMeta").appendChild(row);
+  });
+  $("footNames").textContent = TEAM.map(p=>p.name).join(" · ");
+
+  /* ---- confidence bars, rebuilt from whatever classes the model reports ---- */
+  function buildBars(labels){
+    $("bars").textContent = "";
+    CLASSES = labels.map(label=>{
+      const role = roleOf(label);
+      const row = document.createElement("div"); row.className="bar";
+      row.innerHTML = '<span class="l"></span><span class="t"><span class="f"></span></span><span class="v">0%</span>';
+      row.querySelector(".l").textContent = label;
+      row.querySelector(".f").style.background = COLORS[role] || COLORS.Other;
+      $("bars").appendChild(row);
+      return { label, role, fill:row.querySelector(".f"), val:row.querySelector(".v") };
+    });
+  }
+  buildBars(DEFAULT_LABELS);
+
+  /* ---- scroll spy ---- */
+  const links = [...document.querySelectorAll(".navlinks a")];
+  const spy = new IntersectionObserver(es=>{
+    es.forEach(e=>{
+      if(!e.isIntersecting) return;
+      links.forEach(a=>a.classList.toggle("here", a.getAttribute("href") === "#"+e.target.id));
+    });
+  },{ rootMargin:"-45% 0px -50% 0px" });
+  document.querySelectorAll("main section[id]").forEach(s=>spy.observe(s));
+
+  /* ---- scanner ---- */
+  const video=$("video"), stage=$("stage"), sampler=$("sampler"), sctx=sampler.getContext("2d",{willReadFrequently:true});
+  let stream=null, model=null, loop=null, facing="environment", speak=false, lastSpoken="", engine="hue";
+
+  const setBadge = t => $("engineBadge").textContent = t;
+  const setMsg   = t => $("stageMsg").textContent = t;
+
+  function rgbToHsv(r,g,b){
+    r/=255; g/=255; b/=255;
+    const mx=Math.max(r,g,b), mn=Math.min(r,g,b), d=mx-mn;
+    let h=0;
+    if(d){
+      if(mx===r)      h=60*(((g-b)/d)%6);
+      else if(mx===g) h=60*(((b-r)/d)+2);
+      else            h=60*(((r-g)/d)+4);
+    }
+    if(h<0) h+=360;
+    return { h, s: mx ? d/mx : 0, v: mx };
+  }
+
+  function sampleCentre(){
+    // draw only the centre square of the frame, matching the on-screen reticle
+    const w=video.videoWidth, h=video.videoHeight;
+    if(!w||!h) return null;
+    const side=Math.min(w,h)*0.58, sx=(w-side)/2, sy=(h-side)/2;
+    sctx.drawImage(video, sx, sy, side, side, 0, 0, sampler.width, sampler.height);
+    const d=sctx.getImageData(0,0,sampler.width,sampler.height).data;
+    let r=0,g=0,b=0,n=0;
+    for(let i=0;i<d.length;i+=4){ r+=d[i]; g+=d[i+1]; b+=d[i+2]; n++; }
+    return rgbToHsv(r/n, g/n, b/n);
+  }
+
+  // built-in fallback so the page is demonstrable before a model is attached
+  function hueEngine(){
+    const hsv = sampleCentre();
+    if(!hsv) return null;
+    const out = { Red:0, Yellow:0, Blue:0, Nothing:0, _hue:hsv.h };
+    if(hsv.s < 0.20 || hsv.v < 0.12 || hsv.v > 0.97){ out.Nothing = 0.95; return out; }
+    let total = 0;
+    const w = {};
+    for(const c in HUE_ANCHORS){
+      let d = Math.abs(hsv.h - HUE_ANCHORS[c]);
+      if(d > 180) d = 360 - d;
+      w[c] = Math.exp(-(d*d)/(2*38*38));
+      total += w[c];
+    }
+    const floor = 0.10;
+    total += floor;
+    for(const c in w) out[c] = w[c]/total;
+    out.Nothing = floor/total;
+    return out;
+  }
+
+  async function readFrame(){
+    let values = null, hue = null;
+    const hsv = sampleCentre();
+    if(hsv) hue = hsv.h;
+
+    if(model){
+      try{
+        const preds = await model.predict(video);
+        const byLabel = {};
+        preds.forEach(p=>{ byLabel[p.className.trim()] = p.probability; });
+        values = CLASSES.map(c => byLabel[c.label] || 0);
+      }catch(e){ values = null; }
+    }
+    if(!values){
+      const r = hueEngine();
+      if(!r) return;
+      values = CLASSES.map(c => r[c.role] || 0);
+    }
+
+    CLASSES.forEach((c,i)=>{
+      c.fill.style.width = (values[i]*100).toFixed(0)+"%";
+      c.val.textContent  = Math.round(values[i]*100)+"%";
+    });
+    if(hue != null) $("hueMark").style.left = (hue/360*100).toFixed(1)+"%";
+
+    const ranked = CLASSES.map((c,i)=>({ label:c.label, role:c.role, v:values[i] }))
+                          .sort((a,b)=>b.v-a.v);
+    if(!ranked.length) return;
+    const top = ranked[0];
+    const colours = ranked.filter(e => e.role !== "Nothing");
+
+    if(top.role === "Nothing"){
+      say("—", "Show me an object.");
+    } else if(colours.length > 1 && colours[0].v - colours[1].v < SPLIT){
+      say("Not a primary colour", "Two classes are too close to call. That is the correct answer for an orange or green object.");
+    } else if(top.v >= ANNOUNCE){
+      say(top.label, "Confident reading.", COLORS[top.role] || COLORS.Other, top.label);
+    } else if(top.v >= HOLD){
+      say("Hold steady", "Move closer, or into better light.");
+    } else {
+      say("—", "Nothing clears the threshold yet.");
+    }
+  }
+
+  function say(name, note, colour, speakWord){
+    const el = $("vName");
+    if(el.textContent !== name){ el.textContent = name; }
+    el.style.color = colour || "var(--panel-ink)";
+    $("vNote").textContent = note;
+    if(speak && speakWord && speakWord !== lastSpoken){
+      lastSpoken = speakWord;
+      try{
+        const u = new SpeechSynthesisUtterance(speakWord);
+        u.rate = 0.95; speechSynthesis.cancel(); speechSynthesis.speak(u);
+      }catch(e){}
+    }
+    if(!speakWord) lastSpoken = "";
+  }
+
+  async function start(){
+    try{
+      stream = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:facing }, audio:false });
+      video.srcObject = stream;
+      await video.play();
+      video.classList.toggle("rear", facing === "environment");
+      stage.classList.add("on");
+      $("btnStart").disabled = true; $("btnStop").disabled = false; $("btnFlip").disabled = false;
+      setMsg(model ? "Reading from the trained model" : "Reading from the built-in hue engine");
+      loop = setInterval(readFrame, 220);
+    }catch(e){
+      setMsg("Camera blocked. Allow camera access in your browser, then try again.");
+      $("vNote").textContent = "Camera permission was refused.";
+    }
+  }
+
+  function stop(){
+    clearInterval(loop); loop = null;
+    if(stream){ stream.getTracks().forEach(t=>t.stop()); stream = null; }
+    stage.classList.remove("on");
+    $("btnStart").disabled = false; $("btnStop").disabled = true; $("btnFlip").disabled = true;
+    setMsg("Camera off");
+    say("—", "Start the camera to begin.");
+    CLASSES.forEach(c=>{ c.fill.style.width="0%"; c.val.textContent="0%"; });
+  }
+
+  async function connect(url){
+    url = (url||"").trim();
+    if(!url) return;
+    if(!url.endsWith("/")) url += "/";
+    setBadge("connecting…");
+    $("classNote").textContent = "Loading the trained model…";
+    try{
+      model = await tmImage.load(url + "model.json", url + "metadata.json");
+      const labels = (model.getClassLabels ? model.getClassLabels() : []).filter(Boolean);
+      buildBars(labels.length ? labels : DEFAULT_LABELS);
+      engine = "model";
+      setBadge("trained model");
+      $("classNote").textContent = "Loaded " + CLASSES.length + " classes: " +
+        CLASSES.map(c => c.label + (c.role === "Other" ? " (name not recognised)" : "")).join(", ");
+      if(loop) setMsg("Reading from the trained model");
+    }catch(e){
+      model = null; engine = "hue";
+      buildBars(DEFAULT_LABELS);
+      setBadge("hue fallback — link failed");
+      $("classNote").textContent = "That model could not be loaded. Check the share link ends in a slash, and that you are online — the model is fetched from Google the first time, then cached.";
+    }
+  }
+
+  $("btnStart").addEventListener("click", start);
+  $("btnStop").addEventListener("click", stop);
+  $("btnFlip").addEventListener("click", async ()=>{
+    facing = facing === "environment" ? "user" : "environment";
+    if(stream){ stop(); await start(); }
+  });
+  $("btnSpeak").addEventListener("click", e=>{
+    speak = !speak;
+    e.currentTarget.setAttribute("aria-pressed", String(speak));
+    e.currentTarget.textContent = speak ? "Speech on" : "Speak result";
+    if(!speak) try{ speechSynthesis.cancel(); }catch(err){}
+  });
+  $("btnConnect").addEventListener("click", ()=>connect($("modelUrl").value));
+  $("modelUrl").addEventListener("keydown", e=>{ if(e.key === "Enter") connect(e.currentTarget.value); });
+
+  setBadge("hue fallback");
+  if(MODEL_URL){ $("modelUrl").value = MODEL_URL; connect(MODEL_URL); }
+  window.addEventListener("pagehide", ()=>{ if(stream) stream.getTracks().forEach(t=>t.stop()); });
+})();
+</script>
+</body>
+</html>
